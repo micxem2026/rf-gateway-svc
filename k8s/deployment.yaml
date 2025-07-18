@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rf-gateway-svc
+data:
+  hostname: gateway-svc
+  profiles: local
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rf-gateway-svc
+  labels:
+    app: rf-gateway-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rf-gateway-svc
+  template:
+    metadata:
+      name: rf-gateway-svc
+      labels:
+        app: rf-gateway-svc
+    spec:
+      #      hostAliases:
+      #        - ip: "192.168.1.22"
+      #          hostnames:
+      #            - "gitlab.micxem"
+      containers:
+        - name: rf-gateway-svc
+          image: gitlab.micxem:5050/rights-flow/rf-gateway-svc:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+              protocol: TCP
+          args: [ "--spring.profiles.active=$(RF_GATEWAY_SVC_PROFILES)"]
+          env:
+            - name: RF_GATEWAY_SVC_PROFILES
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-gateway-svc
+                  key: profiles
+            - name: RF_EUREKA_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-eureka-svc
+                  key: serviceURL
+            - name: RF_GATEWAY_SVC_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-gateway-svc
+                  key: hostname
+            - name: RF_AUTH_SVC_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-auth-svc
+                  key: hostname
+            - name: RF_CONFIG_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-config-svc
+                  key: serviceURL
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 15
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 15
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "384Mi"
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: gitlab-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-svc
+  labels:
+    app: rf-gateway-svc
+spec:
+  selector:
+    app: rf-gateway-svc
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8090
+      targetPort: 8090

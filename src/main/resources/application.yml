@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: rf-gateway-svc
+  cloud:
+    config:
+      uri: ${RF_CONFIG_SERVICE_URL:'http://localhost:8888'}
+      name: ${spring.application.name}
+eureka:
+  instance:
+    hostname: ${RF_GATEWAY_SVC_HOSTNAME:${hostname:localhost}}
+  client:
+    serviceUrl:
+      defaultZone: ${RF_EUREKA_SERVICE_URL:'http://localhost:8761/eureka/'}
