@@ -1,5 +1,7 @@
 package me.rightsflow.gateway.filter;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -42,7 +44,7 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
                     String location = response.getHeaders().getFirst(HttpHeaders.LOCATION);
 
                     if (location != null) {
-                        String rewrittenLocation = rewriteRedirectLocation(location, exchange);
+                        String rewrittenLocation = rewriteRedirectLocation(location, exchange, config);
 
                         if (!location.equals(rewrittenLocation)) {
                             log.info("Rewriting redirect from {} to {}", location, rewrittenLocation);
@@ -64,37 +66,38 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
         );
     }
 
-    private String rewriteRedirectLocation(String originalLocation, ServerWebExchange exchange) {
+    private String rewriteRedirectLocation(String originalLocation, ServerWebExchange exchange, Config config) {
         try {
             log.debug("Original redirect location: {}", originalLocation);
             URI originalUri = URI.create(originalLocation);
-            //String host = originalUri.getHost();
-            //int port = originalUri.getPort();
 
-            // Проверяем, нужно ли перенаправлять через Gateway
-            //String serviceAddress = host + ":" + port;
+            String redirectHostUri;
+            String kubernetesServiceHost = System.getenv("KUBERNETES_SERVICE_HOST");
+            if (kubernetesServiceHost != null && !kubernetesServiceHost.isEmpty()) {
+                // Сервис запущен в Kubernetes
+                log.debug("Running in Kubernetes");
+                redirectHostUri = "http://" + config.getRedirectHost() +  ":" + config.getRedirectPort();
+            } else {
+                // Сервис не запущен в Kubernetes
+                log.debug("Not running in Kubernetes");
+                redirectHostUri = "http://" + gatewayHost +  ":" + gatewayPort;
+            }
 
-            //if (proxiedServices.contains(serviceAddress)) {
-                // Перезаписываем URL для прохождения через Gateway
-                String gatewayUrl = "http://" + gatewayHost +  ":" + gatewayPort;
-                String path = originalUri.getPath();
-                String query = originalUri.getQuery();
+            // Перезаписываем URL для прохождения через Gateway
+            String path = originalUri.getPath();
+            String query = originalUri.getQuery();
 
-                StringBuilder rewrittenUrl = new StringBuilder(gatewayUrl);
+            StringBuilder rewrittenUrl = new StringBuilder(redirectHostUri);
 
-                if (path != null) {
-                    rewrittenUrl.append(path);
-                }
+            if (path != null) {
+                rewrittenUrl.append(path);
+            }
 
-                if (query != null) {
-                    rewrittenUrl.append("?").append(query);
-                }
+            if (query != null) {
+                rewrittenUrl.append("?").append(query);
+            }
 
-                return rewrittenUrl.toString();
-            //}
-
-            // Если это внешний редирект или не проксируемый сервис, оставляем как есть
-            //return originalLocation;
+            return rewrittenUrl.toString();
 
         } catch (Exception e) {
             log.warn("Failed to rewrite redirect location: {}", originalLocation, e);
@@ -102,7 +105,10 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
         }
     }
 
+    @Getter
+    @Setter
     public static class Config {
-        // Configuration properties if needed
+        private String redirectHost;
+        private String redirectPort;
     }
 }
