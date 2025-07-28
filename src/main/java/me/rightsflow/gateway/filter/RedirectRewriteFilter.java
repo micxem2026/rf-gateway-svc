@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -83,23 +84,17 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
                 redirectHostUri = "http://" + gatewayHost +  ":" + gatewayPort;
             }
 
-            // Перезаписываем URL для прохождения через Gateway
-            String path = originalUri.getPath();
-            String query = originalUri.getQuery();
+            // Используем UriComponentsBuilder для правильной пересборки URL
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(originalUri);
 
-            StringBuilder rewrittenUrl = new StringBuilder(redirectHostUri);
+            // Заменяем хост и порт на наши
+            builder.host(URI.create(redirectHostUri).getHost())
+                    .port(URI.create(redirectHostUri).getPort())
+                    .scheme(URI.create(redirectHostUri).getScheme());
 
-            if (path != null) {
-                rewrittenUrl.append(path);
-            }
+            return builder.build(true).toUriString();
 
-            if (query != null) {
-                rewrittenUrl.append("?").append(query);
-            }
-
-            return rewrittenUrl.toString();
-
-        } catch (Exception e) {
+         } catch (Exception e) {
             log.warn("Failed to rewrite redirect location: {}", originalLocation, e);
             return originalLocation;
         }
