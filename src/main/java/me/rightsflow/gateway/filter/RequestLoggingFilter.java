@@ -3,6 +3,7 @@ package me.rightsflow.gateway.filter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import me.rightsflow.gateway.service.MetricsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -42,6 +43,10 @@ public class RequestLoggingFilter extends AbstractGatewayFilterFactory<RequestLo
             HttpHeaders headers = exchange.getRequest().getHeaders();
 
             metricsService.incrementGatewayRequests(getRouteName(exchange));
+
+            String traceId = MDC.get("traceId");
+            String spanId = MDC.get("spanId");
+            log.debug("MDC values - traceId: {}, spanId: {}", traceId, spanId);
 
             log.debug("Processing request: {} {} from {}",
                     request.getMethod(),
