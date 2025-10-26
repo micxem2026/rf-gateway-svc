@@ -8,15 +8,10 @@ group = 'me.rightsflow'
 version = '0.0.1-SNAPSHOT'
 description = 'RightsFlow Gateway Server'
 
-/*java {
+java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
-}*/
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
