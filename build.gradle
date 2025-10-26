@@ -72,6 +72,9 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-otel'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
+    implementation 'io.micrometer:context-propagation'
+    implementation 'io.projectreactor:reactor-core-micrometer'
+
     // Caching
 	implementation 'com.github.ben-manes.caffeine:caffeine'
 
