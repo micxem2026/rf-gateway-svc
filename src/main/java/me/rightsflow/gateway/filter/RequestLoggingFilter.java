@@ -83,8 +83,10 @@ public class RequestLoggingFilter extends AbstractGatewayFilterFactory<RequestLo
             return xRealIp;
         }
 
-        return request.getRemoteAddress() != null ?
-                request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
+        if (request.getRemoteAddress() != null && request.getRemoteAddress().getAddress() != null) {
+            return request.getRemoteAddress().getAddress().getHostAddress();
+        }
+        return "unknown";
     }
 
     private String getRouteName(ServerWebExchange exchange) {

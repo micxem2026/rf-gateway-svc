@@ -4,7 +4,7 @@ metadata:
   name: rf-gateway-svc
 data:
   hostname: gateway-svc
-  profiles: local
+  profiles: kuber
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,6 +22,10 @@ spec:
       name: rf-gateway-svc
       labels:
         app: rf-gateway-svc
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8090" # <-- порт приложения
     spec:
       #      hostAliases:
       #        - ip: "192.168.1.22"
@@ -32,7 +36,8 @@ spec:
           image: gitlab.micxem:5050/rights-flow/rf-gateway-svc:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8090
+            - name: http
+              containerPort: 8090
               protocol: TCP
           args: [ "--spring.profiles.active=$(RF_GATEWAY_SVC_PROFILES)"]
           env:
@@ -61,6 +66,17 @@ spec:
                 configMapKeyRef:
                   name: rf-config-svc
                   key: serviceURL
+            - name: RF_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-props
+                  key: otlp_endpoint
+            - name: RF_TRACE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: rf-props
+                  key: rf_trace_enabled
+
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -83,7 +99,7 @@ spec:
             requests:
               memory: "256Mi"
             limits:
-              memory: "384Mi"
+              memory: "512Mi"
       restartPolicy: Always
       imagePullSecrets:
         - name: gitlab-registry-secret

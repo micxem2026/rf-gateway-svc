@@ -1,10 +1,10 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.3'
+	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.example'
+group = 'me.rightsflow'
 version = '0.0.1-SNAPSHOT'
 description = 'RightsFlow Gateway Server'
 
@@ -26,11 +26,14 @@ repositories {
 
 ext {
 	set('springCloudVersion', "2025.0.0")
+    set('micrometerVersion', "1.5.5")
 	name = 'RightsFlow Gateway Server'
 	sourceEncoding='UTF-8'
 }
 
 dependencies {
+
+    implementation(platform("io.micrometer:micrometer-tracing-bom:${micrometerVersion}"))
 
 	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -57,15 +60,17 @@ dependencies {
 	implementation 'io.github.resilience4j:resilience4j-reactor'
 	//implementation 'io.github.resilience4j:resilience4j-spring-boot3'
 
-	// Tracing
-	//implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	//implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    // "Мост" между Micrometer (API метрик) и Prometheus (система мониторинга)
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
-	// Metrics
-	implementation 'io.micrometer:micrometer-registry-prometheus'
+    // Structured Logging
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 
-	// Logging
-	implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+    // Micrometer Tracing
+    implementation 'io.micrometer:micrometer-tracing'
+    implementation 'io.micrometer:micrometer-observation'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
     // Caching
 	implementation 'com.github.ben-manes.caffeine:caffeine'
