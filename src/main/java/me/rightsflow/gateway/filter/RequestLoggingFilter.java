@@ -46,12 +46,13 @@ public class RequestLoggingFilter extends AbstractGatewayFilterFactory<RequestLo
 
             String traceId = MDC.get("traceId");
             String spanId = MDC.get("spanId");
-            log.debug("MDC values - traceId: {}, spanId: {}", traceId, spanId);
 
-            log.debug("Processing request: {} {} from {}",
+            log.debug("Processing request: {} {} from {}, MDC values - traceId: {}, spanId: {}",
                     request.getMethod(),
                     request.getURI(),
-                    getClientIp(request));
+                    getClientIp(request),
+                    traceId,
+                    spanId);
             if (logRequestHeaders) {
                 log.debug("Request headers: {}", headers);
             }
