@@ -44,10 +44,7 @@
                         <fieldName>stacktrace</fieldName>
                     </stackTrace>
                     <logstashMarkers/>
-                    <mdc>
-                        <includeMdcKeyName>traceId</includeMdcKeyName>
-                        <includeMdcKeyName>spanId</includeMdcKeyName>
-                    </mdc>
+                    <mdc/>
                     <pattern>
                         <pattern>
                             {

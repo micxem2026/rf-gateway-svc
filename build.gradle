@@ -26,14 +26,14 @@ repositories {
 
 ext {
 	set('springCloudVersion', "2025.0.0")
-    set('micrometerVersion', "1.5.5")
+    //set('micrometerVersion', "1.15.3")
 	name = 'RightsFlow Gateway Server'
 	sourceEncoding='UTF-8'
 }
 
 dependencies {
 
-    implementation(platform("io.micrometer:micrometer-tracing-bom:${micrometerVersion}"))
+    //implementation(platform("io.micrometer:micrometer-tracing-bom:${micrometerVersion}"))
 
 	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
