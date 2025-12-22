@@ -33,7 +33,7 @@ spec:
       #            - "gitlab.micxem"
       containers:
         - name: rf-gateway-svc
-          image: gitlab.micxem:5050/rights-flow/rf-gateway-svc:latest
+          image: gitlab.me:5005/rights-flow/rf-gateway-svc:latest
           imagePullPolicy: Always
           ports:
             - name: http
