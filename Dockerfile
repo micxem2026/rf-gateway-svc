@@ -1,6 +1,5 @@
-FROM amazoncorretto:17.0.13-al2023-headful as builder
-
 ARG GITLAB
+FROM amazoncorretto:17.0.13-al2023-headful as builder
 
 WORKDIR /src
 COPY . .
