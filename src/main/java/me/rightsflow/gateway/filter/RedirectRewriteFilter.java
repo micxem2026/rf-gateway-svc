@@ -77,7 +77,7 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
             if (kubernetesServiceHost != null && !kubernetesServiceHost.isEmpty()) {
                 // Сервис запущен в Kubernetes
                 log.debug("Running in Kubernetes");
-                redirectHostUri = "http://" + config.getRedirectHost() +  ":" + config.getRedirectPort();
+                redirectHostUri = config.getProtocol() + "://" + config.getRedirectHost() +  ":" + config.getRedirectPort();
             } else {
                 // Сервис не запущен в Kubernetes
                 log.debug("Not running in Kubernetes");
@@ -103,6 +103,7 @@ public class RedirectRewriteFilter extends AbstractGatewayFilterFactory<Redirect
     @Getter
     @Setter
     public static class Config {
+        private String protocol;
         private String redirectHost;
         private String redirectPort;
     }
