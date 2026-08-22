@@ -39,6 +39,9 @@ spec:
             - name: http
               containerPort: 8090
               protocol: TCP
+            - name: management
+              containerPort: 8091
+              protocol: TCP
           args: [ "--spring.profiles.active=$(RF_GATEWAY_SVC_PROFILES)"]
           env:
             - name: RF_GATEWAY_SVC_PROFILES
@@ -80,7 +83,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8090
+              port: 8091
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 10
@@ -89,7 +92,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8090
+              port: 8091
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 10
@@ -118,3 +121,6 @@ spec:
     - name: http
       port: 8090
       targetPort: 8090
+    - name: management
+      port: 8091
+      targetPort: 8091

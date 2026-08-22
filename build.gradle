@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.5.5'
+	id 'org.springframework.boot' version '3.5.9'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -56,8 +56,8 @@ dependencies {
 	//implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 
 	// Rate Limiting
-	implementation 'io.github.resilience4j:resilience4j-ratelimiter'
-	implementation 'io.github.resilience4j:resilience4j-reactor'
+	//implementation 'io.github.resilience4j:resilience4j-ratelimiter'
+	//implementation 'io.github.resilience4j:resilience4j-reactor'
 	//implementation 'io.github.resilience4j:resilience4j-spring-boot3'
 
     // "Мост" между Micrometer (API метрик) и Prometheus (система мониторинга)
